@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./assets/style.css" />
+    <title>Cifrado ITT</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
+      <div class="container">
+  
+        <a class="navbar-brand" href="../index.html">
+          <img
+            src="https://download.logo.wine/logo/ITT_Inc./ITT_Inc.-Logo.wine.png"
+            alt=""
+            width="30"
+            height="24"
+            class="d-inline-block align-text-top"
+          />
+          Cifrado ITT
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item logged-out" style="display: none;">
+              <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#signinModal">Signin</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link logged-out" style="display: none;" href="#" data-bs-toggle="modal" data-bs-target="#signupModal">Signup</a>
+            </li>
+            <li class="nav-item logged-in" style="display: none;">
+              <a class="nav-link" href="#" id="logout">Logout</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="contenedor">
+      <header class="header">
+        <h1>Tipo de cifrado: <label id="cifrado-title">####</label></h1>
+        <p id="cifrado-text" class="text-start">
+          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Architecto,
+          totam. Lorem ipsum dolor sit amet consectetur adipisicing elit. Vitae
+          odio optio quam sint quia cupiditate quos aperiam perspiciatis impedit
+          enim. Veritatis voluptatem quas illo fugiat qui. Repudiandae corrupti
+          omnis nesciunt itaque. Architecto animi corrupti a voluptate inventore
+          exercitationem nemo asperiores.
+          <br /><br />
+        </p>
+      </header>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <div class="col">
+            <label for="exampleFormControlTextarea1" class="form-label fw-bold"
+              >Texto a cifrar</label
+            >
+          </div>
+          <div class="col">
+            <textarea
+              class="form-control"
+              id="exampleFormControlTextarea1"
+              rows="9"
+              placeholder="Escriba el texto a cifrar..."
+            ></textarea>
+          </div>
+        </div>
+        <div class="col align-self-center">
+          <div class="container">
+            <div class="row mb-4">
+              <div class="dropdown">
+                <div class="d-grid gap-2 col-6 mx-auto">
+                  <a
+                    class="btn btn-info dropdown-toggle tipos-btn"
+                    href="#"
+                    role="button"
+                    id="dropdownMenuLink"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    >Tipo de cifrado</a
+                  >
+                  <ul
+                    class="dropdown-menu dropdown-menu-dark"
+                    aria-labelledby="dropdownMenuLink"
+                  >
+                    <li>
+                      <a
+                        class="dropdown-item"
+                        href="#"
+                        onclick="getType('SHA-1')"
+                        >SHA-1</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        class="dropdown-item"
+                        href="#"
+                        onclick="getType('SHA-256')"
+                        >SHA-256</a
+                      >
+                    </li>
+                    <li>
+                      <a
+                        class="dropdown-item"
+                        href="#"
+                        onclick="getType('SHA-512')"
+                        >SHA-512</a
+                      >
+                    </li>
+                    <li>
+                      <a class="dropdown-item" href="#" onclick="getType('MD5')"
+                        >MD5</a
+                      >
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="row mb-4">
+              <div class="d-grid gap-2 col-7 mx-auto">
+                <button
+                  type="button"
+                  class="btn btn-success"
+                  onclick="cifrar()"
+                >
+                  Cifrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="col">
+            <label for="exampleFormControlTextarea2" class="form-label fw-bold"
+              >Texto Cifrado</label
+            >
+          </div>
+          <div class="col">
+            <textarea
+              class="form-control"
+              id="exampleFormControlTextarea2"
+              rows="9"
+              disabled="true"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="signupModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>SignUp</h3>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="signup-form">
+              <div class="mb-4">
+                <input
+                  type="text"
+                  id="signup-email"
+                  class="form-control"
+                  placeholder="mail"
+                  required
+                />
+              </div>
+              <div class="mb-4">
+                <input
+                  type="password"
+                  id="signup-password"
+                  class="form-control"
+                  placeholder="Password"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-primary">
+                Save changes
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="signinModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalSignin"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>SignIn</h3>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="login-form">
+              <div class="mb-4">
+                <input
+                  type="text"
+                  id="login-email"
+                  class="form-control"
+                  placeholder="mail"
+                  required
+                />
+              </div>
+              <div class="mb-4">
+                <input
+                  type="password"
+                  id="login-password"
+                  class="form-control"
+                  placeholder="Password"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-secondary btn-block">
+                Login
+              </button>
+              <button
+                type="button"
+                class="btn btn-info btn-block"
+                id="googleLogin"
+              >
+                Login with Google
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary btn-block"
+                id="facebookLogin"
+              >
+                Login with Facebook
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="contenedor">
+      <footer class="footer bg-dark">
+        <h3>Pie de pagina</h3>
+      </footer>
+    </div>
+    <!-- Js Bootstrap-->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+    <!-- Js Index-->
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="./js/indexJs.js"></script>
+    <!-- Cifrados scripts-->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"
+      integrity="sha512-E8QSvWZ0eCLGk4km3hxSsNmGWbLtSCSUcewDQPQWZF6pEU8GlT8a5fF32wOl1i8ftdMhssTrF/OhyGWwonTcXA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+
+    <!-- FirebaseAuth-->
+
+    <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-app.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+    <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.4/firebase-firestore.js"></script>
+
+    <script>
+      // https://firebase.google.com/docs/web/setup#available-libraries
+
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyDEYE1HpOD7ogu5X19A3HBjLWZ3Ha1zvjs",
+        authDomain: "cifradodb.firebaseapp.com",
+        projectId: "cifradodb",
+        storageBucket: "cifradodb.appspot.com",
+        messagingSenderId: "2405830440",
+        appId: "1:2405830440:web:a3cfad7301175812aa0a1d",
+      };
+
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const fs = firebase.firestore();
+    </script>
+  </body>
+</html>
