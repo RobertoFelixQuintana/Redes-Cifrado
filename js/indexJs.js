@@ -46,16 +46,18 @@ const getType = (input) => {
   }
 };
 
-const cifrar = () => {
+let userActive = false;
+const cifrar = async () => {
   let txtcifrar = document.getElementById("exampleFormControlTextarea1");
-  console.log(txtcifrar.value);
   let inputValue = document.getElementById("dropdownMenuLink").innerHTML;
-  if (txtcifrar.value == "") {
+  let txtcifrado = document.getElementById("exampleFormControlTextarea2");
+
+  if (!txtcifrar.value) {
     alert("Escriba algo para el cifrado...");
+  }
+  if (inputValue == "Tipo de cifrado") {
+    alert("Escoja un tipo de cifrado");
   } else {
-    if (inputValue == "Tipo de cifrado") {
-      alert("Escoja un tipo de cifrado");
-    }
     if (inputValue == "SHA-1") {
       let hash = CryptoJS.SHA1(txtcifrar.value);
       document.getElementById("exampleFormControlTextarea2").value = hash;
@@ -73,8 +75,27 @@ const cifrar = () => {
       document.getElementById("exampleFormControlTextarea2").value = hash;
     }
   }
+  if(userActive == true){
+    await fs.collection("history").doc().set({
+      cifrado: txtcifrar.value,
+      txtcifrado: txtcifrado.value,
+    });
+    await fs.collection("history")
+      .get()
+      .then((snapshot) => {
+        setupHistory(snapshot.docs);
+      });
+  }
 };
 
+const borrar = () => {
+  let txtarea1 = document.getElementById("exampleFormControlTextarea1");
+  let txtarea2 = document.getElementById("exampleFormControlTextarea2");
+  txtarea1.value = "";
+  txtarea2.value = "";
+};
+
+// Visibility menu logs
 const loggedOutLinks = document.querySelectorAll(".logged-out");
 const loggedInLinks = document.querySelectorAll(".logged-in");
 
@@ -103,17 +124,47 @@ signUpForm.addEventListener("submit", (e) => {
       signUpForm.reset();
       // close the modal
       $("#signupModal").modal("hide");
+      $("#accountModal").modal("show");
+    })
+    .catch((err) => {
+      $("#signupModal").modal("hide");
+      $("#accountExistModal").modal("show");
     });
 });
 
-
-$( window ).on( "load", function() {
+// History
+const setupHistory = (data) => {
+  const historyList = document.querySelector(".history");
+  if (data.length) {
+    let html = "";
+    data.forEach((doc) => {
+      const rowhistory = doc.data();
+      const li = `
+      <li class="list-group-item list-group-item-action">
+        <p class="text-break">${rowhistory.cifrado} ==> ${rowhistory.txtcifrado}</[]>
+      </li>
+    `;
+      html += li;
+    });
+    historyList.innerHTML = html;
+  } else {
+    historyList.innerHTML = '<h4 class="text-white">Login to See Histpry</h4>';
+  }
+};
+//Check User onload
+$(window).on("load", function () {
   auth.onAuthStateChanged((user) => {
     if (user) {
-      console.log("signin");
-      loginCheck(user);
+      userActive = true;
+      fs.collection("history")
+        .get()
+        .then((snapshot) => {
+          setupHistory(snapshot.docs);
+          loginCheck(user);
+        });
     } else {
-      console.log("logout");
+      userActive = false;
+      setupHistory([]);
       loginCheck(user);
     }
   });
@@ -124,7 +175,7 @@ const logout = document.querySelector("#logout");
 logout.addEventListener("click", (e) => {
   e.preventDefault();
   auth.signOut().then(() => {
-    console.log("signup out");
+    console.log("log out");
   });
 });
 
@@ -137,16 +188,21 @@ signInForm.addEventListener("submit", (e) => {
   const password = signInForm["login-password"].value;
 
   // Authenticate the User
-  auth.signInWithEmailAndPassword(email, password).then((userCredential) => {
-    // clear the form
-    signInForm.reset();
-    // close the modal
-    $("#signinModal").modal("hide");
-  });
+  auth
+    .signInWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      // clear the form
+      signInForm.reset();
+      // close the modal
+      $("#signinModal").modal("hide");
+      $("#loginModal").modal("show");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 });
 
 // events
-
 
 // Login with Google
 const googleButton = document.querySelector("#googleLogin");
@@ -155,32 +211,42 @@ googleButton.addEventListener("click", (e) => {
   e.preventDefault();
   signInForm.reset();
   $("#signinModal").modal("hide");
+  $("#loginModal").modal("show");
 
   const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider).then((result) => {
-    console.log(result);
-    console.log("google sign in");
-  })
-  .catch(err => {
-    console.log(err);
-  })
+  auth
+    .signInWithPopup(provider)
+    .then((result) => {
+      console.log(result);
+      console.log("google sign in");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 });
 
-// Login with Facebook
-const facebookButton = document.querySelector('#facebookLogin');
+// Toggle password
+const togglePassword = document.querySelector("#togglePassword");
+const togglePassword2 = document.querySelector("#togglePassword2");
+const password = document.querySelector("#login-password");
+const passwordSignup = document.querySelector("#signup-password");
 
-facebookButton.addEventListener('click', e => {
-  e.preventDefault();
-  signInForm.reset();
-  $("#signinModal").modal("hide");
+togglePassword.addEventListener("click", function () {
+  // toggle the type attribute
+  const type =
+    password.getAttribute("type") === "password" ? "text" : "password";
+  password.setAttribute("type", type);
+  // toggle the eye icon
+  this.classList.toggle("fa-eye");
+  this.classList.toggle("fa-eye-slash");
+});
 
-  const provider = new firebase.auth.FacebookAuthProvider();
-  auth.signInWithPopup(provider).then((result) => {
-    console.log(result);
-    console.log("facebook sign in");
-  })
-  .catch(err => {
-    console.log(err);
-  })
-
-})
+togglePassword2.addEventListener("click", function () {
+  // toggle the type attribute
+  const type =
+    passwordSignup.getAttribute("type") === "password" ? "text" : "password";
+  passwordSignup.setAttribute("type", type);
+  // toggle the eye icon
+  this.classList.toggle("fa-eye");
+  this.classList.toggle("fa-eye-slash");
+});

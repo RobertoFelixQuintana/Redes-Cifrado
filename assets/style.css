@@ -16,8 +16,7 @@ body{
     grid-template-rows: repeat(1,auto);
 }
 .contenedor,
-.contenedor .header,
-.contenedor .footer
+.contenedor .header
 {
     background: #fff;
     padding: 15px;
@@ -31,11 +30,6 @@ body{
     text-align: center;
 }
 
-.contenedor .footer{
-    color: #fff;
-    grid-column: span 5;
-    text-align: center;
-}
 
 @media screen and (max-width:768px){
     .contenedor .contenido{
