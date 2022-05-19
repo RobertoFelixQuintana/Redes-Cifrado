@@ -198,7 +198,12 @@ signInForm.addEventListener("submit", (e) => {
       $("#loginModal").modal("show");
     })
     .catch((err) => {
-      console.log(err);
+      if(err.code == 'auth/wrong-password'){
+        alert('Contraseña incorrecta');
+      }
+      if(err.code == 'auth/user-not-found'){
+        alert('Esta cuenta no existe');
+      }
     });
 });
 
@@ -207,18 +212,15 @@ signInForm.addEventListener("submit", (e) => {
 // Login with Google
 const googleButton = document.querySelector("#googleLogin");
 
-googleButton.addEventListener("click", (e) => {
+googleButton.addEventListener("click", async (e) => {
   e.preventDefault();
   signInForm.reset();
-  $("#signinModal").modal("hide");
-  $("#loginModal").modal("show");
-
   const provider = new firebase.auth.GoogleAuthProvider();
-  auth
+  await auth
     .signInWithPopup(provider)
     .then((result) => {
-      console.log(result);
-      console.log("google sign in");
+      $("#signinModal").modal("hide");
+      $("#loginModal").modal("show");
     })
     .catch((err) => {
       console.log(err);
@@ -250,3 +252,5 @@ togglePassword2.addEventListener("click", function () {
   this.classList.toggle("fa-eye");
   this.classList.toggle("fa-eye-slash");
 });
+
+// user: firebase.auth().currentUser.uid,
