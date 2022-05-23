@@ -53,10 +53,16 @@ const cifrar = async () => {
   let txtcifrado = document.getElementById("exampleFormControlTextarea2");
 
   if (!txtcifrar.value) {
-    alert("Escriba algo para el cifrado...");
+    document.getElementById("modal-title-alert").innerHTML =
+      "Escriba algo para cifrar...";
+    $("#modalAlert").modal("show");
+    return;
   }
   if (inputValue == "Tipo de cifrado") {
-    alert("Escoja un tipo de cifrado");
+    document.getElementById("modal-title-alert").innerHTML =
+      "Escoja un tipo de cifrado";
+    $("#modalAlert").modal("show");
+    return;
   } else {
     if (inputValue == "SHA-1") {
       let hash = CryptoJS.SHA1(txtcifrar.value);
@@ -74,25 +80,31 @@ const cifrar = async () => {
       let hash = CryptoJS.MD5(txtcifrar.value);
       document.getElementById("exampleFormControlTextarea2").value = hash;
     }
-  }
-  if(userActive == true){
-    await fs.collection("history").doc().set({
-      cifrado: txtcifrar.value,
-      txtcifrado: txtcifrado.value,
-    });
-    await fs.collection("history")
-      .get()
-      .then((snapshot) => {
-        setupHistory(snapshot.docs);
+    //Insert Data History and refresh data
+    if (userActive == true) {
+      await fs.collection("history").doc().set({
+        id: auth.currentUser.uid,
+        txtcifrar: txtcifrar.value,
+        tipocifrado: inputValue,
+        txtcifrado: txtcifrado.value,
       });
+      await fs
+        .collection("history")
+        .get()
+        .then((snapshot) => {
+          setupHistory(snapshot.docs);
+        });
+    }
   }
 };
 
 const borrar = () => {
   let txtarea1 = document.getElementById("exampleFormControlTextarea1");
   let txtarea2 = document.getElementById("exampleFormControlTextarea2");
+  let tipo = document.getElementById("dropdownMenuLink");
   txtarea1.value = "";
   txtarea2.value = "";
+  tipo.innerHTML = "Tipo de cifrado";
 };
 
 // Visibility menu logs
@@ -115,7 +127,6 @@ signUpForm.addEventListener("submit", (e) => {
   e.preventDefault();
   const email = signUpForm["signup-email"].value;
   const password = signUpForm["signup-password"].value;
-
   // Authenticate the User
   auth
     .createUserWithEmailAndPassword(email, password)
@@ -124,35 +135,83 @@ signUpForm.addEventListener("submit", (e) => {
       signUpForm.reset();
       // close the modal
       $("#signupModal").modal("hide");
-      $("#accountModal").modal("show");
+      document.getElementById("modal-title-alert").innerHTML =
+        "Has creado tu cuenta con exito";
+      $("#modalAlert").modal("show");
     })
     .catch((err) => {
-      $("#signupModal").modal("hide");
-      $("#accountExistModal").modal("show");
+      console.log("error", err);
+      if (err.code == "auth/weak-password") {
+        $("#signupModal").modal("hide");
+        document.getElementById("modal-title-alert").innerHTML =
+          "La contraseña es muy corta";
+        $("#modalAlert").modal("show");
+      }
+      if (err.code == "auth/email-already-in-use") {
+        $("#signupModal").modal("hide");
+        document.getElementById("modal-title-alert").innerHTML =
+          "La cuenta ya existe";
+        $("#modalAlert").modal("show");
+      }
     });
 });
 
 // History
 const setupHistory = (data) => {
   const historyList = document.querySelector(".history");
+  let count = 0;
   if (data.length) {
     let html = "";
     data.forEach((doc) => {
       const rowhistory = doc.data();
-      const li = `
-      <li class="list-group-item list-group-item-action">
-        <p class="text-break">${rowhistory.cifrado} ==> ${rowhistory.txtcifrado}</[]>
-      </li>
-    `;
-      html += li;
+      if (auth.currentUser.uid == rowhistory.id) {
+        const li = `
+        <li class="list-group-item list-group-item-action">
+          <p class="text-break">Tipo cifrado: ${rowhistory.tipocifrado}</p>
+          <p class="text-break">${rowhistory.txtcifrar} ==> ${rowhistory.txtcifrado}</p>
+        </li>
+      `;
+        html += li;
+        count++;
+      }
     });
     historyList.innerHTML = html;
+  }
+  if (count == 0) {
+    historyList.innerHTML =
+      "<h4 id='no-history' class='text-center'>No hay historial</h4>";
+  }
+};
+
+//Delete History
+let historyExist = "";
+
+const DeleteHistory = async () => {
+  if (historyExist == "No hay historial") {
+    $("#historyModal").modal("hide");
+    document.getElementById("modal-title-alert").innerHTML =
+      "No tienes historial que borrar";
+    $("#modalAlert").modal("show");
   } else {
-    historyList.innerHTML = '<h4 class="text-white">Login to See Histpry</h4>';
+    await fs
+      .collection("history")
+      .get()
+      .then((snapshot) => {
+        const data = snapshot.docs;
+        data.forEach((doc) => {
+          const rowhistory = doc.data();
+          if (auth.currentUser.uid == rowhistory.id) {
+            doc.ref.delete().then(() => {
+              setupHistory([]);
+            });
+          }
+        });
+      });
   }
 };
 //Check User onload
 $(window).on("load", function () {
+  let userName = document.getElementById('user');
   auth.onAuthStateChanged((user) => {
     if (user) {
       userActive = true;
@@ -161,21 +220,27 @@ $(window).on("load", function () {
         .then((snapshot) => {
           setupHistory(snapshot.docs);
           loginCheck(user);
+          userName.innerHTML = `<i class="fa fa-user-check"></i> ${user.email}`;
         });
     } else {
       userActive = false;
       setupHistory([]);
       loginCheck(user);
+      userName.innerHTML = "";
+
     }
   });
 });
+
 // Logout
 const logout = document.querySelector("#logout");
 
 logout.addEventListener("click", (e) => {
   e.preventDefault();
   auth.signOut().then(() => {
-    console.log("log out");
+    document.getElementById("modal-title-alert").innerHTML =
+      "Has cerrado sesion correctamente";
+    $("#modalAlert").modal("show");
   });
 });
 
@@ -195,19 +260,23 @@ signInForm.addEventListener("submit", (e) => {
       signInForm.reset();
       // close the modal
       $("#signinModal").modal("hide");
-      $("#loginModal").modal("show");
+      document.getElementById("modal-title-alert").innerHTML =
+        "Has iniciado sesion correctamente";
+      $("#modalAlert").modal("show");
     })
     .catch((err) => {
-      if(err.code == 'auth/wrong-password'){
-        alert('Contraseña incorrecta');
+      if (err.code == "auth/wrong-password") {
+        document.getElementById("modal-title-alert").innerHTML =
+          "Contraseña incorrecta";
+        $("#modalAlert").modal("show");
       }
-      if(err.code == 'auth/user-not-found'){
-        alert('Esta cuenta no existe');
+      if (err.code == "auth/user-not-found") {
+        document.getElementById("modal-title-alert").innerHTML =
+          "Esta cuenta no existe";
+        $("#modalAlert").modal("show");
       }
     });
 });
-
-// events
 
 // Login with Google
 const googleButton = document.querySelector("#googleLogin");
@@ -215,12 +284,14 @@ const googleButton = document.querySelector("#googleLogin");
 googleButton.addEventListener("click", async (e) => {
   e.preventDefault();
   signInForm.reset();
+  $("#signinModal").modal("hide");
   const provider = new firebase.auth.GoogleAuthProvider();
   await auth
     .signInWithPopup(provider)
     .then((result) => {
-      $("#signinModal").modal("hide");
-      $("#loginModal").modal("show");
+      document.getElementById("modal-title-alert").innerHTML =
+        "Has iniciado sesion correctamente";
+      $("#modalAlert").modal("show");
     })
     .catch((err) => {
       console.log(err);
@@ -252,5 +323,3 @@ togglePassword2.addEventListener("click", function () {
   this.classList.toggle("fa-eye");
   this.classList.toggle("fa-eye-slash");
 });
-
-// user: firebase.auth().currentUser.uid,

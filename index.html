@@ -47,9 +47,17 @@
               <a
                 class="nav-link text-light"
                 href="#"
+                id="user"
+                ></a
+              >
+            </li>
+            <li class="nav-item logged-in" style="display: none">
+              <a
+                class="nav-link text-light"
+                href="#"
                 data-bs-toggle="modal"
                 data-bs-target="#historyModal"
-                >History</a
+                >Historial</a
               >
             </li>
             <li class="nav-item logged-out" style="display: none">
@@ -240,9 +248,9 @@
         © 2022 Copyright:
         <a class="text-dark" href="#">CIFRADO ITT</a>
       </div>
-      <!-- Copyright -->
     </footer>
-    <!-- Modal -->
+
+    <!-- Create Account Modal-->
     <div
       class="modal fade"
       id="signupModal"
@@ -309,10 +317,10 @@
       </div>
     </div>
 
-    <!---Login modal-->
+    <!---Alerts Modal-->
     <div
       class="modal fade"
-      id="loginModal"
+      id="modalAlert"
       tabindex="-1"
       role="dialog"
       aria-labelledby="exampleModalLabel"
@@ -321,8 +329,11 @@
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header justify-content-center">
-            <h3 class="modal-title modal-dialog-centered">
-              Has iniciado sesion!
+            <h3
+              class="modal-title modal-dialog-centered"
+              id="modal-title-alert"
+            >
+              texto
             </h3>
             <button
               type="button"
@@ -330,37 +341,23 @@
               data-bs-dismiss="modal"
               aria-label="Close"
             ></button>
+          </div>
+          <div class="modal-body">
+            <div class="d-grid mt-3">
+              <button
+                type="submit"
+                class="btn btn-primary"
+                data-bs-dismiss="modal"
+              >
+                Confirmar
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!---Account created modal-->
-    <div
-      class="modal fade"
-      id="accountModal"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header justify-content-center">
-            <h3 class="modal-title modal-dialog-centered">
-              Has creado tu cuenta con exito!
-            </h3>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!---History modal-->
+    <!---History Modal-->
     <div
       class="modal fade"
       id="historyModal"
@@ -383,44 +380,29 @@
             ></button>
           </div>
           <div class="modal-body">
-            <ul class="list-group history">
-
-            </ul>
-            <div class="d-grid mt-3">
-              <button type="submit" class="btn btn-primary" data-bs-dismiss="modal">Confirm</button>
+            <ul class="list-group history"></ul>
+            <div class="d-grid gap-2">
+              <button
+                type="submit"
+                class="btn btn-primary"
+                data-bs-dismiss="modal"
+              >
+                Confirmar
+              </button>
+              <button
+                type="submit"
+                class="btn btn-danger btn-delete"
+                onclick="DeleteHistory()"
+              >
+                Borrar historial
+              </button>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!---Account exist-->
-    <div
-      class="modal fade"
-      id="accountExistModal"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header justify-content-center">
-            <h3 class="modal-title modal-dialog-centered">
-              Ya existe esa cuenta!
-            </h3>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Signin Modal-->
+    <!-- Modal LogIn-->
     <div
       class="modal fade"
       id="signinModal"
